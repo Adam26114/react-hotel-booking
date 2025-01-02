@@ -1,14 +1,16 @@
 <?php
-// process-booking.php
 
-// Enable error reporting for debugging
+
 error_reporting(E_ALL);
 ini_set('display_errors', 1);
 
-// Get the raw POST data
+
+header('Content-Type: application/json');
+
+
 $data = json_decode(file_get_contents('php://input'), true);
 
-// Validate the input data
+
 if (empty($data)) {
     http_response_code(400); // Bad Request
     echo json_encode(['status' => 'error', 'message' => 'No data received']);
@@ -29,16 +31,18 @@ if (empty($roomId) || empty($checkIn) || empty($checkOut) || empty($guests) || e
     exit;
 }
 
-// Simulate saving the booking to a database
-try {
-    // Here, you would typically insert the data into a database
-    // Example:
-    // $pdo = new PDO('mysql:host=localhost;dbname=hotel', 'username', 'password');
-    // $stmt = $pdo->prepare('INSERT INTO bookings (room_id, check_in, check_out, adults, children, total) VALUES (?, ?, ?, ?, ?, ?)');
-    // $stmt->execute([$roomId, $checkIn, $checkOut, $guests['adults'], $guests['children'], $total]);
 
-    // For now, just log the data
-    file_put_contents('bookings.log', json_encode($data) . PHP_EOL, FILE_APPEND);
+try {
+
+    $logData = [
+        'roomId' => $roomId,
+        'checkIn' => $checkIn,
+        'checkOut' => $checkOut,
+        'guests' => $guests,
+        'total' => $total,
+        'timestamp' => date('Y-m-d H:i:s')
+    ];
+    file_put_contents('bookings.log', json_encode($logData) . PHP_EOL, FILE_APPEND);
 
     // Return a success response
     http_response_code(200); // OK
@@ -48,4 +52,3 @@ try {
     http_response_code(500); // Internal Server Error
     echo json_encode(['status' => 'error', 'message' => 'Failed to save booking: ' . $e->getMessage()]);
 }
-?>

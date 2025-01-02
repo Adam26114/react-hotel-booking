@@ -265,7 +265,7 @@
                 };
 
                 try {
-                    const response = await fetch('process-booking.php', {
+                    const response = await fetch('api/process-booking.php', {
                         method: 'POST',
                         headers: {
                             'Content-Type': 'application/json',
