@@ -133,5 +133,3 @@ All dependencies are loaded via CDN, so no installation is required.
 This project is open-source and available under the MIT License.
 
 ---
-
-Feel free to modify this `README.md` file to suit your project’s specific needs! Let me know if you need further assistance. 😊
