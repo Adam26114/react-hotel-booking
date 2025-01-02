@@ -68,9 +68,28 @@
             offset: -10px;
         }
 
+        .hero-banner {
+            position: relative;
+        }
+
+        .hero-banner p {
+            z-index: 2;
+        }
+
+        .hero-banner::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: rgba(0, 0, 0, 0.2);
+            border-radius: 10px;
+        }
+
 
         .ant-pagination-item-active,
-        .ant-pagination .ant-pagination-item-active a  {
+        .ant-pagination .ant-pagination-item-active a {
             border-color: var(--primary-color) !important;
             color: var(--primary-color) !important;
         }
@@ -92,7 +111,8 @@
 
     <script type="text/babel">
         const App = () => {
-            const { Card, Button, DatePicker, InputNumber, Typography, message, Layout, Space, Divider,Carousel ,Select ,Pagination, Badge ,ConfigProvider } = window.antd;
+            const { Card, Button, DatePicker, InputNumber, Typography, message, Layout, Space, Divider,Carousel ,Select ,Pagination, Badge ,ConfigProvider ,Input } = window.antd;
+            const { Search } = Input; 
             const { RangePicker } = DatePicker;
             const { Title, Text } = Typography;
             const { Content } = Layout;
@@ -111,6 +131,7 @@
             const [currentPage, setCurrentPage] = React.useState(1);
             const [pageSize, setPageSize] = React.useState(3);
             const [totalRooms, setTotalRooms] = React.useState(0);
+            const [searchQuery, setSearchQuery] = React.useState('');
 
             React.useEffect(() => {
                 setTimeout(() => {
@@ -267,10 +288,24 @@
                 setPageSize(pageSize);
             };
 
+            const handleSearch = (e) => {
+                setSearchQuery(e.target.value);
+            };
+
+            const filteredRooms = rooms.filter(room =>
+                room.name.toLowerCase().includes(searchQuery.toLowerCase())
+            );
+
             return (
                 <ConfigProvider
                     theme={{
                         components: {
+                            Input: {
+                                colorBorder: 'var(--dark-accent-color)',
+                                colorPrimary: 'var(--dark-accent-color)',
+                                colorBackground: 'var(--secondary-color)',
+                                colorPrimaryHover: 'var(--dark-accent-color)',
+                            },
                             Pagination: {
                                 itemActiveBg: 'var(--dark-accent-color)', 
                                 itemActiveBorderColor: 'var(--dark-accent-color)',
@@ -278,6 +313,10 @@
                             },
 
                             Button:{
+                                colorPrimary: 'var(--dark-accent-color)', // Background color
+                                colorPrimaryBorder: 'var(--dark-accent-color)', // Border color
+                                colorPrimaryHover: 'var(--dark-accent-color)', // Hover background color
+                                colorPrimaryActive: 'var(--dark-accent-color)', // Active background color
                                 defaultBg: 'var(--dark-accent-color)',
                                 primaryColor:"#ffffff"
                             }
@@ -287,15 +326,28 @@
                     <Layout className="min-h-screen bg-[color:--primary-color] color-[color:--dark-accent-color]">
                         <Content className="p-6">
                             <div className="max-w-7xl mx-auto">
-                                <div className="hero-banner mb-8">
-                                    <p className="text-4xl font-bold text-white">
-                                    Hotel Room Booking 
-                                    </p>
+                                <div className="hero-banner mb-8 flex flex-col justify-center items-center gap-4">
+                                    <p className="text-4xl font-bold text-white">Hotel Room Booking</p>
+                                    <Button type="primary" size="large" className="mt-4 btn" href="#rooms">
+                                        Explore Rooms
+                                    </Button>
                                 </div>
+
+
                                     
-                                <div className="grid grid-cols-5 gap-10">
+                                <div id="rooms" className="grid grid-cols-5 gap-10">
                                     <div className="col-span-5 md:col-span-3 flex flex-col gap-6 mb-8">
-                                        {rooms.map(room => (
+                                        <div className="mb-4">
+                                            <Search
+                                                placeholder="Search rooms by name..."
+                                                value={searchQuery}
+                                                onChange={handleSearch}
+                                                className="w-full"
+                                                size="large"
+                                                enterButton 
+                                            />
+                                        </div>
+                                        {filteredRooms.map(room => (
                                             <Card
                                                 key={room.id}
                                                 hoverable
@@ -365,93 +417,95 @@
                                         )}
                                 </div>
                                 
-                                <div className="col-span-5 md:col-span-2">
-                                    <Card className="max-w-2xl mx-auto bg-[color:--secondary-color]">
+                                <div className="flex flex-col gap-5 col-span-5 md:col-span-2">
+                                        <Card className=" bg-[color:--secondary-color]">
 
-                                        <form onSubmit={handleBooking}>
-                                            <Space direction="vertical" className="w-full h-auto">
-                                                <div>
-                                                    <Text strong>Select Dates</Text>
-                                                    <RangePicker 
-                                                        className="w-full"
-                                                        onChange={setDates}
-                                                        format="YYYY-MM-DD"
-                                                    />
-                                                </div>
-
-                                                <div className="grid grid-cols-2 gap-4">
+                                            <form onSubmit={handleBooking}>
+                                                <Space direction="vertical" className="w-full h-auto">
                                                     <div>
-                                                        <Text strong>Adults</Text>
-                                                        <Select
-                                                            defaultValue="1"
-                                                            style={{ width: "100%" }}
-                                                            options={[
-                                                                {
-                                                                    value: "1",
-                                                                    label: "1",
-                                                                },
-                                                                {
-                                                                    value: "2",
-                                                                    label: "2",
-                                                                },
-                                                                {
-                                                                    value: "3",
-                                                                    label: "3",
-                                                                },
-                                                                {
-                                                                    value: "4",
-                                                                    label: "4",
-                                                                },
-                                                            ]}
+                                                        <Text strong>Select Dates</Text>
+                                                        <RangePicker 
+                                                            className="w-full"
+                                                            onChange={setDates}
+                                                            format="YYYY-MM-DD"
                                                         />
                                                     </div>
-                                                    <div>
-                                                        <Text strong>Children</Text>
-                                                        <Select
-                                                            defaultValue="0"
-                                                            style={{ width: "100%" }}
-                                                            options={[
-                                                                {
-                                                                    value: "0",
-                                                                    label: "0",
-                                                                },
-                                                                {
-                                                                    value: "1",
-                                                                    label: "1",
-                                                                },
-                                                                {
-                                                                    value: "2",
-                                                                    label: "2",
-                                                                },
-                                                                {
-                                                                    value: "3",
-                                                                    label: "3",
-                                                                },
-                                                            ]}
-                                                        />
+
+                                                    <div className="grid grid-cols-2 gap-4">
+                                                        <div>
+                                                            <Text strong>Adults</Text>
+                                                            <Select
+                                                                defaultValue="1"
+                                                                style={{ width: "100%" }}
+                                                                options={[
+                                                                    {
+                                                                        value: "1",
+                                                                        label: "1",
+                                                                    },
+                                                                    {
+                                                                        value: "2",
+                                                                        label: "2",
+                                                                    },
+                                                                    {
+                                                                        value: "3",
+                                                                        label: "3",
+                                                                    },
+                                                                    {
+                                                                        value: "4",
+                                                                        label: "4",
+                                                                    },
+                                                                ]}
+                                                            />
+                                                        </div>
+                                                        <div>
+                                                            <Text strong>Children</Text>
+                                                            <Select
+                                                                defaultValue="0"
+                                                                style={{ width: "100%" }}
+                                                                options={[
+                                                                    {
+                                                                        value: "0",
+                                                                        label: "0",
+                                                                    },
+                                                                    {
+                                                                        value: "1",
+                                                                        label: "1",
+                                                                    },
+                                                                    {
+                                                                        value: "2",
+                                                                        label: "2",
+                                                                    },
+                                                                    {
+                                                                        value: "3",
+                                                                        label: "3",
+                                                                    },
+                                                                ]}
+                                                            />
+                                                        </div>
                                                     </div>
-                                                </div>
 
-                                                {selectedRoom && dates && (
-                                                    <Card className="bg-[color:--accent-color]">
-                                                        <Title level={4}>Booking Summary</Title>
-                                                        <p>Room: {selectedRoom.name}</p>
-                                                        <p>Total Nights: {dates[1].diff(dates[0], 'days')}</p>
-                                                        <p>Total Amount: ${total}</p>
-                                                    </Card>
-                                                )}
+                                                    {selectedRoom && dates && (
+                                                        <Card className="bg-[color:--accent-color]">
+                                                            <Title level={4}>Booking Summary</Title>
+                                                            <p>Room: {selectedRoom.name}</p>
+                                                            <p>Total Nights: {dates[1].diff(dates[0], 'days')}</p>
+                                                            <p>Total Amount: ${total}</p>
+                                                        </Card>
+                                                    )}
 
-                                                <Button 
-                                                    type="primary" 
-                                                    htmlType="submit"
-                                                    disabled={!selectedRoom || !dates}
-                                                    className="w-full btn mt-4"
-                                                >
-                                                    Book Now
-                                                </Button>
-                                            </Space>
+                                                    <Button 
+                                                        type="primary" 
+                                                        htmlType="submit"
+                                                        disabled={!selectedRoom || !dates}
+                                                        className="w-full btn mt-4"
+                                                    >
+                                                        Book Now
+                                                    </Button>
+                                                </Space>
                                             </form>
                                         </Card>
+
+                                        
                                     </div>
                                 </div>
                             </div>
